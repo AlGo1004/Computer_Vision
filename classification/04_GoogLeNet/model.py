@@ -104,7 +104,12 @@ class GoogLeNet(nn.Module):
 
 
 class Inception(nn.Module):
-    def __init__(self,in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj):
+    def __init__(self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj):
+        """
+        :param in_channels: 输入特征矩阵的深度
+        ch1x1、ch3x3red、ch3x3、ch5x5red、ch5x5、param pool_proj:
+        上面六个对应Inception模块需要的参数
+        """
         super(Inception, self).__init__()
 
         self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=1)
@@ -158,6 +163,9 @@ class InceptionAux(nn.Module):
 
 
 class BasicConv2d(nn.Module):
+    '''
+    搭一个卷积层，和ReLU函数共同使用
+    '''
     def __init__(self, in_channels, out_channels, **kwargs):
         super(BasicConv2d, self).__init__()
 

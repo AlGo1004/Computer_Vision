@@ -17,13 +17,13 @@ def main():
     print("using {} device.".format(device))
     data_transform = {
         "train": transforms.Compose([transforms.RandomResizedCrop(224),
-                                    transforms.RandomHorizontalFlip(),
-                                    transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]),
+                                     transforms.RandomHorizontalFlip(),
+                                     transforms.ToTensor(),
+                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]),
 
         "val": transforms.Compose([transforms.Resize((224, 224)),
-                                  transforms.ToTensor(),
-                                  transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+                                   transforms.ToTensor(),
+                                   transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     }
 
     data_root = os.path.abspath(os.path.join(os.getcwd(), ".."))  # 获取数据集根目录
@@ -45,13 +45,13 @@ def main():
     print('using {} dataloader workers every process'.format(nw))
 
     train_loader = torch.utils.data.DataLoader(train_dataset,
-                                               batch_size=batch_size,shuffle=True,
+                                               batch_size=batch_size, shuffle=True,
                                                num_workers=nw)
     val_dataset = datasets.ImageFolder(root=os.path.join(image_path, "val"),
                                        transform=data_transform["val"])
     val_num = len(val_dataset)
     val_loader = torch.utils.data.DataLoader(val_dataset,
-                                             batch_size=batch_size,shuffle=False,
+                                             batch_size=batch_size, shuffle=False,
                                              num_workers=nw)
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
@@ -87,7 +87,7 @@ def main():
             running_loss += loss.item()
             # 将损失写入tensorboard
             writer.add_scalar('training loss', running_loss / (step + 1), epoch *
-            len(train_loader) + step)
+                              len(train_loader) + step)
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
                                                                      epochs,
                                                                      loss)

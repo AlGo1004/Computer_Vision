@@ -17,12 +17,13 @@ def main():
     net.load_state_dict(torch.load('lenet.pth'))
 
     im = Image.open('CT5.jpg')
-    im = transform(im)
+    im = transform(im)  # [C, H, W]
     im = torch.unsqueeze(im, dim=0)  # [N, C, H, W]
 
     with torch.no_grad():
         outputs = net(im)
         predict = torch.max(outputs, dim=1)[1].numpy()
+        # predict = torch.softmax(outputs, dim=1)  # 概率
     print(classes[int(predict)])
 
 

@@ -47,20 +47,20 @@ def make_features(cfg: list):
     layers = []
     in_channels = 3
     for v in cfg:
-        if v == "M":
+        if v == "M": # 表示maxpool，创建一个最大池化层
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
-        else:
+        else: # 否则创建卷积层
             conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
             layers += [conv2d, nn.ReLU(True)]
             in_channels = v
-    return nn.Sequential(*layers)
+    return nn.Sequential(*layers) # 以非关键字参数传入列表
 
-
+# 定义一个cfg字典文件，表示网络配置，M:Maxpool
 cfgs = {
     'vgg11': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'vgg13': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'vgg16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'vgg19': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
+    'vgg19': [64, 64, 'M' , 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
 }
 
 

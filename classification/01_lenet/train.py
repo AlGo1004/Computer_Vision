@@ -12,24 +12,24 @@ import matplotlib.pyplot as plt
 def main():
     transform = transforms.Compose(
         [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]  # 标准化
     )
-    # 训练集
+    # 训练集 50000张
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
                                              download=False, transform=transform)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=36, shuffle=True, num_workers=0)
 
-    # 测试集
+    # 测试集 10000张
     val_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=False, transform=transform)
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=5000, shuffle=False, num_workers=0)
     val_data_iter = iter(val_loader)  # 转换成迭代器
-    val_image, val_label = next(val_data_iter) # 通过next函数获取一批数据
+    val_image, val_label = next(val_data_iter)  # 通过next函数获取一批数据
 
     net = LeNet()
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), lr=0.001)
 
-    for epoch in range(5):
+    for epoch in range(5):  # 5：训练集迭代5轮
         running_loss = 0.0  # 累加在训练过程中的损失
         for step, data in enumerate(train_loader, start=0):  # 遍历训练集样本，返回每一批数据data和对应的step步数
             inputs, labels = data  # 将数据分离成input和label
