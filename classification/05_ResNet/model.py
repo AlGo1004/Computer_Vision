@@ -3,14 +3,19 @@ import torch
 
 
 class BasicBlock(nn.Module):
-    expansion = 1  # 卷积核个数没有发生变化
+    expansion = 1  # 主分支卷积核个数没有发生变化
 
     '''
     ResNet18和ResNet34的基本残差块
     stride=2时为虚线残差结构
     downsample:对应虚线的残差结构
     '''
+
     def __init__(self, in_channel, out_channel, stride=1, downsample=None, **kwargs):
+        """
+        :param out_channel: 主分支上卷积核个数
+        :param downsample:虚线残差结构
+        """
         super(BasicBlock, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=out_channel,
                                kernel_size=3, stride=stride, padding=1, bias=False)
@@ -23,7 +28,7 @@ class BasicBlock(nn.Module):
 
     def forward(self, x):
         identity = x
-        if self.downsample is not None:
+        if self.downsample is not None:  # 没有输入下采样函数，即没有虚线部分
             identity = self.downsample(x)
 
         out = self.conv1(x)
@@ -42,26 +47,30 @@ class Bottleneck(nn.Module):
     """
     50,101,152层
     """
-    expansion = 4
+    expansion = 4  # 输出维度为输入维度的4倍
 
     def __init__(self, in_channel, out_channel, stride=1, downsample=None,
                  groups=1, width_per_group=64):
+        """
+        :param groups: 组卷积的组数
+        :param width_per_group:组卷积中每个group的卷积核个数
+        """
         super(Bottleneck, self).__init__()
 
         width = int(out_channel * (width_per_group / 64.)) * groups
 
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=width,
-                              kernel_size=1, stride=1, bias=False)  # squeeze channels
+                               kernel_size=1, stride=1, bias=False)  # squeeze channels
         self.bn1 = nn.BatchNorm2d(width)
         # --------------------------------------
-        self.conv2 = nn.Conv2d(in_channels=width, out_channels=width,groups=groups,
-                              kernel_size=3, stride=stride, bias=False, padding=1)
+        self.conv2 = nn.Conv2d(in_channels=width, out_channels=width, groups=groups,
+                               kernel_size=3, stride=stride, bias=False, padding=1)
 
         self.bn2 = nn.BatchNorm2d(width)
         # ---------------------------------------
-        self.conv3 = nn.Conv2d(in_channels=width, out_channels=out_channel*self.expansion,
-                              kernel_size=1, stride=1, bias=False)  # unsqueeze channels
-        self.bn3 = nn.BatchNorm2d(out_channel*self.expansion)
+        self.conv3 = nn.Conv2d(in_channels=width, out_channels=out_channel * self.expansion,
+                               kernel_size=1, stride=1, bias=False)  # unsqueeze channels
+        self.bn3 = nn.BatchNorm2d(out_channel * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
 
@@ -95,15 +104,11 @@ class ResNet(nn.Module):
                  include_top=True,
                  groups=1,
                  width_per_group=64):
-        '''
-
-        :param block:
-        :param block_num:
-        :param num_classes:
+        """
         :param include_top: 以后在ResNet网络基础上搭建更复杂的网络时用得到
         :param groups:
         :param width_per_group:
-        '''
+        """
         super(ResNet, self).__init__()
         self.include_top = include_top
         self.in_channel = 64
@@ -134,8 +139,6 @@ class ResNet(nn.Module):
         :param block:残差块
         :param channel:残差结构中卷积层1的卷积核个数
         :param block_num:该层包含多少个残差结构
-        :param stride:
-        :return:
         '''
         downsample = None
         if stride != 1 or self.in_channel != channel * block.expansion:
@@ -191,3 +194,25 @@ def resnet50(num_classes=1000, include_top=True):
 def resnet101(num_classes=1000, include_top=True):
     # https://download.pytorch.org/models/resnet101-5d3b4d8f.pth
     return ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, include_top=include_top)
+
+
+def resnext50_32x4d(num_classes=1000, include_top=True):
+    # https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth
+    groups = 32
+    width_per_group = 4
+    return ResNet(Bottleneck, [3, 4, 6, 3],
+                  num_classes=num_classes,
+                  include_top=include_top,
+                  groups=groups,
+                  width_per_group=width_per_group)
+
+
+def resnext101_32x8d(num_classes=1000, include_top=True):
+    # https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth
+    groups = 32
+    width_per_group = 8
+    return ResNet(Bottleneck, [3, 4, 23, 3],
+                  num_classes=num_classes,
+                  include_top=include_top,
+                  groups=groups,
+                  width_per_group=width_per_group)
